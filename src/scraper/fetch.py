@@ -6,7 +6,7 @@ import requests
 URL = "https://play.limitlesstcg.com/decks?game=pocket"
 
 DATA_DIR = Path("data")
-RAW_HTML_PATH = DATA_DIR / "raw_decks_pocket.html"
+RAW_HTML_PATH = DATA_DIR / "raw" / "raw_decks_pocket.html"
 
 def fetch_html(save_raw: bool = True) -> str:
     """
