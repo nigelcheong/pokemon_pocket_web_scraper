@@ -11,7 +11,7 @@ ROW_RE = re.compile(
     r"(?P<count>\d+)\s+"
     r"(?P<share>\d+(?:\.\d+)?)%\s+"
     r"(?P<wins>\d+)\s*-\s*(?P<losses>\d+)\s*-\s*(?P<ties>\d+)\s+"
-    r"(?P<winpct>\d+(?:\.\d+)?)%"
+    r"(?P<winpct>(?:\d+(?:\.\d+)?|NaN))%"  # Updated to match either a number or 'NaN'
 )
 
 def parse_deck_table(html: str) -> List[Dict[str, str]]:
@@ -21,17 +21,17 @@ def parse_deck_table(html: str) -> List[Dict[str, str]]:
     soup = BeautifulSoup(html, "lxml")
     rows: List[Dict] = []
 
-    for a in soup.select('a[href^="/decks/"]'):
+    for container in soup.select('tr, div, li'):
+        a = container.select_one('a[href^="/decks/"]')
+        if a is None:
+            continue
+        
         deck = a.get_text(strip=True)
         href = a.get("href", "").strip()
 
         if not deck or not href:
             continue
 
-        container = a.find_parent(["tr", "div", "li"])
-        if container is None:
-            container = a.parent
-        
         row_text = container.get_text(" ", strip=True)
 
         m = ROW_RE.search(row_text)
@@ -43,7 +43,10 @@ def parse_deck_table(html: str) -> List[Dict[str, str]]:
         wins = int(m.group("wins"))
         losses = int(m.group("losses"))
         ties = int(m.group("ties"))
-        winpct = float(m.group("winpct"))
+        
+        # Check for 'NaN%' in winpct
+        winpct_str = m.group("winpct")
+        winpct = float(winpct_str) if winpct_str != 'NaN' else 0.0
 
         rows.append({
             "deck": deck,
