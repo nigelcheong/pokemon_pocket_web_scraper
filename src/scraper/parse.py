@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import re
+from pathlib import Path
 from typing import List, Dict
 from bs4 import BeautifulSoup
+
+from src.config import DECK_FORMATS, DATA_DIR
 
 BASE = "https://play.limitlesstcg.com"
 
@@ -67,3 +70,27 @@ def parse_deck_table(html: str) -> List[Dict[str, str]]:
             unique_rows.append(r)
 
     return unique_rows
+
+def parse_all_deck_formats() -> List[Dict[str, str]]:
+    """
+    Parses deck data from all deck format HTML files and returns combined results.
+    Each row includes a 'format' field indicating the deck format (B2, B1a, etc).
+    """
+    all_rows: List[Dict] = []
+
+    for deck_format in DECK_FORMATS:
+        format_file_path = DATA_DIR / "raw" / f"raw_decks_pocket_{deck_format}.html"
+        
+        if not format_file_path.exists():
+            continue
+
+        html = format_file_path.read_text(encoding="utf-8")
+        rows = parse_deck_table(html)
+        
+        # Add format field to each row
+        for row in rows:
+            row["format"] = deck_format
+        
+        all_rows.extend(rows)
+
+    return all_rows
