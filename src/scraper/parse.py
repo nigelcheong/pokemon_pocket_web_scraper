@@ -87,9 +87,10 @@ def parse_all_deck_formats() -> List[Dict[str, str]]:
         html = format_file_path.read_text(encoding="utf-8")
         rows = parse_deck_table(html)
         
-        # Add format field to each row
+        # Add format and primary key field to each row
         for row in rows:
             row["format"] = deck_format
+            row["deck_format_key"] = f"{row['deck']}|{deck_format}"
         
         all_rows.extend(rows)
 

@@ -9,6 +9,23 @@ URL = "https://play.limitlesstcg.com/decks?game=pocket"
 
 RAW_HTML_PATH = DATA_DIR / "raw" / "raw_decks_pocket.html"
 
+def fetch_url(url: str, save_raw: bool = False, raw_name: str = "raw.html") -> str:
+    """
+    Fetches the given URL and returns the HTML as a string.
+    Optionally saves the raw HTML to data/raw/<raw_name>.
+    """
+    from src.config import DATA_DIR
+    headers = {
+        "User-Agent": "Mozilla/5.0 (compatible; educational scraper)"
+    }
+    resp = requests.get(url, headers=headers, timeout=30)
+    resp.raise_for_status()
+    html = resp.text
+    if save_raw:
+        raw_path = DATA_DIR / "raw" / raw_name
+        raw_path.write_text(html, encoding="utf-8")
+    return html
+
 def fetch_html(save_raw: bool = True) -> str:
     """
     Downloads the decks page HTML for each deck format and returns it as a string.
