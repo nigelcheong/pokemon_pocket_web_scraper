@@ -62,6 +62,7 @@ def save_sqlite(rows: List[Dict]) -> Path:
         "Win (%)": "win_pct",
         "url": "url",
         "snapshot_utc": "snapshot_utc",
+        "format": "format",
     }
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
 

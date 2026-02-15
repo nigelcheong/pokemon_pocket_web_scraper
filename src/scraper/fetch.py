@@ -3,15 +3,16 @@ from __future__ import annotations
 from pathlib import Path
 import requests
 
+from src.config import DECK_FORMATS, DATA_DIR
+
 URL = "https://play.limitlesstcg.com/decks?game=pocket"
 
-DATA_DIR = Path("data")
 RAW_HTML_PATH = DATA_DIR / "raw" / "raw_decks_pocket.html"
 
 def fetch_html(save_raw: bool = True) -> str:
     """
-    Downloads the decks page HTML and returns it as a string.
-    Optionally saves the raw HTML to data/raw_decks_pocket.html for debugging.
+    Downloads the decks page HTML for each deck format and returns it as a string.
+    Optionally saves the raw HTML to separate files for each deck format.
     """
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -19,12 +20,18 @@ def fetch_html(save_raw: bool = True) -> str:
         "User-Agent": "Mozilla/5.0 (compatible; educational scraper)"
     }
 
-    resp = requests.get(URL, headers=headers, timeout=30)
-    resp.raise_for_status()
+    html_combined = ""
 
-    html = resp.text
+    for deck_format in DECK_FORMATS:
+        format_url = f"{URL}&set={deck_format}"
+        resp = requests.get(format_url, headers=headers, timeout=30)
+        resp.raise_for_status()
 
-    if save_raw:
-        RAW_HTML_PATH.write_text(html, encoding="utf-8")
+        html = resp.text
+        html_combined += html
 
-    return html
+        if save_raw:
+            format_file_path = DATA_DIR / "raw" / f"raw_decks_pocket_{deck_format}.html"
+            format_file_path.write_text(html, encoding="utf-8")
+
+    return html_combined
