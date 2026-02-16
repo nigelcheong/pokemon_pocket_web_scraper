@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Dict
 from bs4 import BeautifulSoup
 
-from src.config import DECK_FORMATS, DATA_DIR
+from src.config import DECK_FORMATS, DATA_DIR, RAW_DECK_DATA_DIR
 
 BASE = "https://play.limitlesstcg.com"
 
@@ -79,7 +79,7 @@ def parse_all_deck_formats() -> List[Dict[str, str]]:
     all_rows: List[Dict] = []
 
     for deck_format in DECK_FORMATS:
-        format_file_path = DATA_DIR / "raw" / f"raw_decks_pocket_{deck_format}.html"
+        format_file_path = RAW_DECK_DATA_DIR / f"raw_decks_pocket_{deck_format}.html"
         
         if not format_file_path.exists():
             continue
