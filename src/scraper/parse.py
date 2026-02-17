@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Dict
 from bs4 import BeautifulSoup
 
-from src.config import DECK_FORMATS, DATA_DIR, RAW_DECK_DATA_DIR
+from src.config import DECK_FORMATS, RAW_DECK_DATA_DIR
 
 BASE = "https://play.limitlesstcg.com"
 

@@ -1,23 +1,38 @@
-from src.scraper.fetch import fetch_deck_html
+from src.scraper.fetch import fetch_deck_html, fetch_matchups_html
 from src.scraper.parse import parse_all_deck_formats
 from src.pipeline.transform import add_snapshot_metadata
 from src.pipeline.load import save_latest_snapshot_csv, save_sqlite
 
 def main():
     print("--- Pokemon TCGP Web Scraper ---")
-    user_input = input("Download HTML files? (y/n): ").strip().lower()
+
+    # Download deck HTML files if user agrees
+    user_input = input("Download Deck HTML files? (y/n): ").strip().lower()
     if user_input == 'y':
-        print("Downloading HTML files...")
+        print("Downloading Deck HTML files...")
         fetch_deck_html(save_raw=True)
-        print("HTML files downloaded.")
+        print("Deck HTML files downloaded.")
     else:
         print("\n" + "=" * 30)
         print("Skipping HTML download. Using existing files.")
 
     print("\n" + "=" * 30)
+
     print("Parsing deck formats...")
     rows = parse_all_deck_formats()
     print(f"Parsed {len(rows)} deck rows.")
+    
+    print("\n" + "=" * 30)
+    
+    # Download matchup HTML files if user agrees
+    user_input = input("Download Matchups HTML files? (y/n): ").strip().lower()
+    if user_input == 'y':
+        print("Downloading Matchups HTML files...")
+        matchups_urls = fetch_matchups_html(rows)
+        print("Matchups HTML files downloaded.")
+    else:
+        print("\n" + "=" * 30)
+        print("Skipping Matchups HTML download. Using existing files.")
 
     print("\n" + "=" * 30)
     print("Adding snapshot metadata...")

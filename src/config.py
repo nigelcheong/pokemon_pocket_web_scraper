@@ -7,4 +7,7 @@ DECK_FORMATS = ["B2", "B1a", "B1", "A4a", "A4", "A3b", "A3a", "A3", "A2b", "A2a"
 DATA_DIR = Path("data")
 RAW_DATA_DIR = DATA_DIR / "raw"
 RAW_DECK_DATA_DIR = RAW_DATA_DIR / "decks"
+RAW_MATCHUPS_DATA_DIR = RAW_DATA_DIR / "matchups"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
+
+URL = "https://play.limitlesstcg.com/decks?game=pocket"
