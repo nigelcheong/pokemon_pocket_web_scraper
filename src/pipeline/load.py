@@ -5,22 +5,14 @@ from typing import List, Dict
 import sqlite3
 import pandas as pd
 
-PROCESSED_DIR = Path("data") / "processed"
-
-# "Latest snapshot" CSV for Power BI (overwrite each run)
-LATEST_CSV_PATH = PROCESSED_DIR / "deck_stats_latest.csv"
-
-# Optional: keep your original output too
-OUT_PATH = PROCESSED_DIR / "decks_basic.csv"
-
-DB_PATH = Path("data") / "app.db"
+from src.config import PROCESSED_DATA_DIR, LATEST_CSV_PATH, OUT_PATH, DB_PATH, MATCHUPS_CSV_PATH
 
 
 def save_csv(rows: List[Dict], path: Path = OUT_PATH) -> Path:
     """
     Generic CSV saver (kept from your base).
     """
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(rows)
     df.to_csv(path, index=False)
     return path
@@ -31,7 +23,7 @@ def save_latest_snapshot_csv(rows: List[Dict], path: Path = LATEST_CSV_PATH) -> 
     Power BI-friendly snapshot CSV.
     Overwrites each run so Power BI can refresh the same file path.
     """
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+    PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
     df = pd.DataFrame(rows)
 
     # Keep columns stable and in a nice order if present
@@ -71,3 +63,20 @@ def save_sqlite(rows: List[Dict]) -> Path:
     conn.close()
 
     return DB_PATH
+
+def save_matchups_csv(rows: List[Dict], path: Path = MATCHUPS_CSV_PATH) -> Path:
+    """
+    Save parsed matchup rows to a CSV file in the processed directory.
+    Overwrites each run for easy downstream use.
+    """
+    PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    df = pd.DataFrame(rows)
+
+    # Reorder columns so deck_name is first, followed by the rest in a logical order
+    preferred_order = [
+        "deck_name", "set", "opponent_deck", "count", "wins", "losses", "ties", "score", "win_pct"
+    ]
+    ordered_cols = [c for c in preferred_order if c in df.columns] + [c for c in df.columns if c not in preferred_order]
+    df = df[ordered_cols]
+    df.to_csv(path, index=False)
+    return path

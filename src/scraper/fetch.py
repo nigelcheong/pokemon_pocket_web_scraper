@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 import requests
 from typing import List, Dict
+from collections import defaultdict
 
 from src.config import DECK_FORMATS, RAW_DECK_DATA_DIR, RAW_MATCHUPS_DATA_DIR, URL
 
@@ -44,8 +45,8 @@ def fetch_matchups_html(deck_rows: List[Dict[str, str]]) -> List[str]:
     headers = {
         "User-Agent": "Mozilla/5.0 (compatible; educational scraper)"
     }
+    
     # Group rows by deck_format
-    from collections import defaultdict
     format_rows = defaultdict(list)
     for row in deck_rows:
         deck_format = row.get('format', 'unknown')
